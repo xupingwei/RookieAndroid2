@@ -19,9 +19,20 @@ public abstract class ApiCallback<T> extends Subscriber<T> {
     private Context mContext;
     private SweetAlertDialog dialog;
     private String msg;
+    private boolean isShowDialog = true;
 
-    protected boolean showDialog() {
-        return true;
+//    protected boolean showDialog() {
+//        return true;
+//    }
+
+    /**
+     * @param context context
+     * @param msg     dialog message
+     */
+    public ApiCallback(Context context, String msg, boolean isShowDialog) {
+        this.mContext = context;
+        this.msg = msg;
+        this.isShowDialog = isShowDialog;
     }
 
     /**
@@ -29,22 +40,28 @@ public abstract class ApiCallback<T> extends Subscriber<T> {
      * @param msg     dialog message
      */
     public ApiCallback(Context context, String msg) {
-        this.mContext = context;
-        this.msg = msg;
+        this(context, msg, true);
     }
 
     /**
      * @param context context
      */
     public ApiCallback(Context context) {
-        this(context, "请稍后...");
+        this(context, "请稍后...", true);
+    }
+
+    /**
+     * @param context context
+     */
+    public ApiCallback(Context context, boolean isShowDialog) {
+        this(context, "请稍后...", isShowDialog);
     }
 
 
     @Override
     public void onStart() {
         super.onStart();
-        if (showDialog()) {
+        if (isShowDialog) {
             dialog = new SweetAlertDialog(mContext, SweetAlertDialog.PROGRESS_TYPE)
                     .setTitleText(msg);
             dialog.setCancelable(true);
@@ -80,14 +97,14 @@ public abstract class ApiCallback<T> extends Subscriber<T> {
         } else {
             onFailure(e.getMessage());
         }
-        if (showDialog())
+        if (isShowDialog)
             dialog.dismiss();
     }
 
 
     @Override
     public void onNext(T model) {
-        if (showDialog())
+        if (isShowDialog)
             dialog.dismiss();
         LoggerUtils.json(new Gson().toJson(model));
         onSuccess(model);
@@ -95,7 +112,7 @@ public abstract class ApiCallback<T> extends Subscriber<T> {
 
     @Override
     public void onCompleted() {
-        if (showDialog())
+        if (isShowDialog)
             dialog.dismiss();
     }
 
