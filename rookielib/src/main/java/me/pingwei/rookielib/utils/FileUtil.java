@@ -620,7 +620,7 @@ public class FileUtil {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             int count;
-            byte buffer[] = new byte[4096];
+            byte buffer[] = new byte[3 * 1024];
             while ((count = fis.read(buffer)) > 0) {
                 baos.write(buffer, 0, count);
             }

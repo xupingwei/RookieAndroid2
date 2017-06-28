@@ -1,27 +1,26 @@
 package me.pingwei.rookielib.base;
 
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+
+import com.umeng.analytics.MobclickAgent;
 
 import me.pingwei.rookielib.R;
 import me.pingwei.rookielib.app.ActivityTask;
 import me.pingwei.rookielib.interfaces.IToaster;
 import me.pingwei.rookielib.interfaces.IUserState;
-import me.pingwei.rookielib.utils.LoggerUtils;
+import me.pingwei.rookielib.utils.DialogUtil;
+import me.pingwei.rookielib.utils.DisplayHelper;
 import me.pingwei.rookielib.utils.Toaster;
-import rx.Observable;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 
 /**
@@ -31,10 +30,8 @@ public abstract class BaseActivity extends AppCompatActivity implements IToaster
 
     private Toolbar toolbar;
     private TextView toolbarTitle;
-    private TextView toolbarMenu;
-
-
-    public CompositeSubscription subscription;
+    private TextView toolbarRightOne;
+    private TextView toolbarRightTwo;
 
     /**
      * 设置要显示的Layout ID
@@ -85,8 +82,8 @@ public abstract class BaseActivity extends AppCompatActivity implements IToaster
      * @param id
      */
     public void setToolbarTitleBackground(int id) {
-        if (toolbarTitle != null) {
-            toolbarTitle.setBackgroundDrawable(getResources().getDrawable(id));
+        if (toolbar != null) {
+            toolbar.setBackgroundResource(id);
         }
     }
 
@@ -110,24 +107,13 @@ public abstract class BaseActivity extends AppCompatActivity implements IToaster
         return toolbar;
     }
 
-    /**
-     * 隐藏右边菜单
-     */
-    public void hideRightMenu() {
-        if (toolbarMenu != null) {
-            toolbarMenu.setVisibility(View.GONE);
-        }
+    public TextView getToolbarRightOne() {
+        return toolbarRightOne;
     }
 
-    /**
-     * 显示右边菜单
-     */
-    public void showRightMenu() {
-        if (toolbarMenu != null) {
-            toolbarMenu.setVisibility(View.VISIBLE);
-        }
+    public TextView getToolbarRightTwo() {
+        return toolbarRightTwo;
     }
-
 
     /**
      * 设置标题文字颜色
@@ -138,24 +124,13 @@ public abstract class BaseActivity extends AppCompatActivity implements IToaster
         toolbarTitle.setTextColor(colorId);
     }
 
-    /**
-     * 获取工具菜单对象(导航的右边按钮)
-     *
-     * @return
-     */
-    public TextView getToolbarRightMenu() {
-        return toolbarMenu;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
+        super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WindowManager.LayoutParams localLayoutParams = getWindow().getAttributes();
             localLayoutParams.flags = (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags);
         }
-
-        super.onCreate(savedInstanceState);
         initVariables();
         ActivityTask.addActivity(this);
         if (setLayoutId() != 0) {
@@ -164,7 +139,8 @@ public abstract class BaseActivity extends AppCompatActivity implements IToaster
             if (null != toolbar) {
                 toolbar.setTitle("");
                 toolbarTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
-                toolbarMenu = (TextView) toolbar.findViewById(R.id.toolbar_menu_right);
+                toolbarRightTwo = (TextView) toolbar.findViewById(R.id.toolbar_right_two);
+                toolbarRightOne = (TextView) toolbar.findViewById(R.id.toolbar_right_one);
                 setSupportActionBar(toolbar);
                 toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
@@ -172,24 +148,53 @@ public abstract class BaseActivity extends AppCompatActivity implements IToaster
                         ActivityTask.finishCurrentActivity();
                     }
                 });
+                setDelegateArea(toolbarRightOne);
+                setDelegateArea(toolbarRightTwo);
             }
         }
-        subscription = new CompositeSubscription();
-
         initViews();
-
         loadData();
+    }
+
+    private void setDelegateArea(final TextView delegate) {
+        delegate.post(new Runnable() {
+            @Override
+            public void run() {
+                // 构造一个 "矩型" 对象
+                Rect delegateArea = new Rect();
+                // Hit rectangle in parent's coordinates
+                delegate.getHitRect(delegateArea);
+                // 扩大触摸区域矩阵值
+                delegateArea.left -= DisplayHelper.dip2px(getBaseContext(), 10);
+                delegateArea.top -= DisplayHelper.dip2px(getBaseContext(), 10);
+                delegateArea.right += DisplayHelper.dip2px(getBaseContext(), 10);
+                delegateArea.bottom += DisplayHelper.dip2px(getBaseContext(), 10);
+                /**
+                 * 构造扩大后的触摸区域对象
+                 * 第一个构造参数表示  矩形面积
+                 * 第二个构造参数表示 被扩大的触摸视图对象
+                 */
+                TouchDelegate expandedArea = new TouchDelegate(delegateArea, delegate);
+
+                if (View.class.isInstance(delegate.getParent())) {
+                    // 设置视图扩大后的触摸区域
+                    ((View) delegate.getParent()).setTouchDelegate(expandedArea);
+                }
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        MobclickAgent.onResume(this);
         onResumeData();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        MobclickAgent.onPause(this);
     }
 
     /**
@@ -227,20 +232,19 @@ public abstract class BaseActivity extends AppCompatActivity implements IToaster
 
     @Override
     protected void onDestroy() {
-        onUnsubscribe();
         super.onDestroy();
     }
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
+        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         super.startActivityForResult(intent, requestCode);
-        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
     }
 
     @Override
     public void startActivity(Intent intent) {
+        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         super.startActivity(intent);
-        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
     }
 
 
@@ -248,30 +252,6 @@ public abstract class BaseActivity extends AppCompatActivity implements IToaster
     public void finish() {
         super.finish();
         overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-    }
-
-    public void addSubscription(Observable observable, Subscriber subscriber) {
-        if (subscription == null) {
-            subscription = new CompositeSubscription();
-        }
-        subscription.add(observable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber));
-    }
-
-    public void addSubscription(Subscription sub) {
-        if (subscription == null) {
-            subscription = new CompositeSubscription();
-        }
-        subscription.add(sub);
-    }
-
-    public void onUnsubscribe() {
-        LoggerUtils.d("onUnsubscribe");
-        //取消注册，以避免内存泄露
-        if (subscription != null && subscription.hasSubscriptions())
-            subscription.unsubscribe();
     }
 
 

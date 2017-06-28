@@ -45,7 +45,7 @@ public class OrderRoundImageView extends ImageView {
         Bitmap bitmap = null;
         if (drawable instanceof BitmapDrawable) {
             bitmap = ((BitmapDrawable) drawable).getBitmap();
-            Bitmap b = getRoundBitmap(bitmap, 5);
+            Bitmap b = getRoundBitmap(bitmap, 20);
             final Rect rectSrc = new Rect(0, 0, b.getWidth(), b.getHeight());
             final Rect rectDest = new Rect(0, 0, getWidth(), getHeight());
             paint.reset();

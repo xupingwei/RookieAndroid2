@@ -1,0 +1,14 @@
+# Created by .ignore support plugin (hsz.mobi)
+.gradle/
+.idea/
+gradle/
+gradlew
+gradlew.bat
+local.properties
+rookielib/.idea
+rookielib/gradle
+rookielib/build
+v7appcompat/build
+libzxing/build
+app/build
+/build

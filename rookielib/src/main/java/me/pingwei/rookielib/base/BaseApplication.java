@@ -1,5 +1,7 @@
 package me.pingwei.rookielib.base;
 
+import android.app.Application;
+
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
@@ -10,8 +12,6 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.tumblr.remember.Remember;
 
-import org.litepal.LitePalApplication;
-
 import java.io.File;
 
 import me.pingwei.rookielib.config.Config;
@@ -21,15 +21,11 @@ import me.pingwei.rookielib.utils.LoggerUtils;
 /**
  * Created by xupingwei on 2016/4/14.
  */
-public abstract class BaseApplication extends LitePalApplication {
+public abstract class BaseApplication extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
-
-        //项目默认值
-        LitePalApplication.initialize(this);
-
         //项目初始化
         init();
 
@@ -59,8 +55,6 @@ public abstract class BaseApplication extends LitePalApplication {
                 .writeDebugLogs() // Remove for releaseapp
                 .build();//开始构建
         ImageLoader.getInstance().init(config);
-
-
     }
 
     protected abstract void init();

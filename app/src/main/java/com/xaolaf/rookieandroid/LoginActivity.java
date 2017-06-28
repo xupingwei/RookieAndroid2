@@ -17,6 +17,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.xaolaf.rookieandroid.base.CustomerBaseActivity;
+
 import me.pingwei.rookielib.retrofit.ApiCallback;
 import me.pingwei.rookielib.retrofit.RetrofitClient;
 import me.pingwei.rookielib.utils.LoggerUtils;
@@ -26,22 +28,16 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends CustomerBaseActivity {
+public class LoginActivity extends CustomerBaseActivity implements ILoginView {
 
 
     private static final int REQUEST_READ_CONTACTS = 0;
-
-
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-
-//    private UserLoginTask mAuthTask = null;
-
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    private LoginPresenter loginPresenter;
 
     @Override
     protected int setLayoutId() {
@@ -53,8 +49,6 @@ public class LoginActivity extends CustomerBaseActivity {
     public void initViews() {
         super.initViews();
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-//        populateAutoComplete();
-
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -81,6 +75,7 @@ public class LoginActivity extends CustomerBaseActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+        loginPresenter = new LoginPresenter(this, this);
     }
 
     private void populateAutoComplete() {
@@ -123,10 +118,6 @@ public class LoginActivity extends CustomerBaseActivity {
     }
 
     private void attemptLogin() {
-//        if (mAuthTask != null) {
-//            return;
-//        }
-
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
@@ -155,20 +146,7 @@ public class LoginActivity extends CustomerBaseActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
-
-            subscription.add(apiStores.userLogin(email, password, 1)
-                    .compose(RetrofitClient.<LoginBean>applySchedulers())
-                    .subscribe(new ApiCallback<LoginBean>(this, "正在加载") {
-                        @Override
-                        public void onSuccess(LoginBean model) {
-                            LoggerUtils.e(model.getToken());
-                        }
-
-                        @Override
-                        public void onFailure(String msg) {
-                            showToast(msg);
-                        }
-                    }));
+            loginPresenter.login(email, password, 1);
         }
     }
 
@@ -206,6 +184,18 @@ public class LoginActivity extends CustomerBaseActivity {
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onLoginSuccess(LoginBean bean) {
+        //登录成功
+        showToast("登录成功");
+    }
+
+    @Override
+    public void onLoginFailed(String message) {
+        //登录失败
+        showToast(message);
     }
 }
 

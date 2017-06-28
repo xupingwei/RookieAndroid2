@@ -1,0 +1,44 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.jakewharton.butterknife'
+android {
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
+    defaultConfig {
+        applicationId "com.xiaoyeyun.android"
+        minSdkVersion 15
+        targetSdkVersion 22
+        versionCode 10000
+        versionName "1.0.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            zipAlignEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+        ignoreWarnings true
+        checkAllWarnings false
+    }
+}
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    testCompile 'junit:junit:4.12'
+    compile project(':v7appcompat')
+    compile 'com.jakewharton:butterknife:8.5.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    compile 'com.yydcdut.sdlv:sdlv:0.6.1'
+    /*类似微信的图片选择器*/
+    compile 'me.iwf.photopicker:PhotoPicker:0.9.5@aar'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    //图片放大
+    compile 'com.github.chrisbanes:PhotoView:2.0.0'
+    compile project(':rookielib')
+}

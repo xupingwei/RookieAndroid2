@@ -28,7 +28,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="14dp"
             android:text="加载中..."
-            android:textColor="@color/gray_53"
+            android:textColor="@color/color_53"
             android:textSize="14sp" />
     </RelativeLayout>
 </LinearLayout>

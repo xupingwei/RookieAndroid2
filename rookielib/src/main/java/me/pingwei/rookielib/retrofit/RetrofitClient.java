@@ -6,6 +6,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import me.pingwei.rookielib.config.Config;
 import me.pingwei.rookielib.utils.FileUtil;
@@ -29,7 +30,7 @@ public class RetrofitClient {
     /**
      * 服务器地址
      */
-    private static final String API_HOST = Config.API_HOST;
+    private static String API_HOST = "http://pingwei.me/";   //线上
     private static Retrofit mRetrofit;
 
     public static Retrofit getRetrofit() {
@@ -40,18 +41,22 @@ public class RetrofitClient {
                     Log.i("RxJava", message);
                 }
             });
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             //网络缓存路径文件
             String dirPath = FileUtil.getDirAbsolutPath(Config.RETROFIT_CACHE);
             File httpCacheDirectory = new File(dirPath);
-            //通过拦截器设置缓存
-            CacheInterceptor cacheInterceptor = new CacheInterceptor();
+//            //通过拦截器设置缓存
+//            CacheInterceptor cacheInterceptor = new CacheInterceptor();
             OkHttpClient client = new OkHttpClient.Builder()
+                    .retryOnConnectionFailure(true) //失败重连
+                    .readTimeout(30 * 1000, TimeUnit.MILLISECONDS)
                     //设置缓存
                     .cache(new Cache(httpCacheDirectory, 10 * 1024 * 1024))
                     //log请求参数
                     .addInterceptor(interceptor)
                     //网络请求缓存
-                    .addInterceptor(cacheInterceptor)
+//                    .addInterceptor(cacheInterceptor)
+//                    .addInterceptor(new BaseIntercepter())
                     .build();
             mRetrofit = new Retrofit.Builder()
                     .client(client)
@@ -62,29 +67,6 @@ public class RetrofitClient {
         }
         return mRetrofit;
     }
-
-//    /**
-//     * 对网络接口返回的Response进行分割操作
-//     *
-//     * @param response
-//     * @param <T>
-//     * @return
-//     */
-//    public static <T> Observable<T> flatResponse(final Response<T> response) {
-//        return Observable.create(new Observable.OnSubscribe<T>() {
-//
-//            @Override
-//            public void call(Subscriber<? super T> subscriber) {
-//                LoggerUtils.e(response.toString());
-//                if (response.success()) {
-//                    createData(response.getObject());
-//                } else {
-//                    Observable.error(new APIException(response.getCode(), response.getMessage()));
-//                }
-//            }
-//        });
-//    }
-
 
     /**
      * 创建成功的数据
@@ -109,15 +91,15 @@ public class RetrofitClient {
     }
 
     /**
-     * 自定义异常，当接口返回的{@link Response#flag}不为{@link Constant#OK}时，需要跑出此异常
+     * 自定义异常，当接口返回的{@link Response#status}不为{@link Constant#OK}时，需要跑出此异常
      * eg：登陆时验证码错误；参数为传递等
      */
     public static class APIException extends Exception {
-        public int code;
+        public int status;
         public String message;
 
-        public APIException(int code, String message) {
-            this.code = code;
+        public APIException(int status, String message) {
+            this.status = status;
             this.message = message;
         }
 
@@ -143,19 +125,18 @@ public class RetrofitClient {
      * @param <T>
      * @return
      */
-    public static <T> Observable.Transformer<Response<T>, T> applySchedulers() {
+    public static <T> Observable.Transformer<Response, T> applySchedulers() {
 
-        return new Observable.Transformer<Response<T>, T>() {
+        return new Observable.Transformer<Response, T>() {
             @Override
-            public Observable<T> call(Observable<Response<T>> tObservable) {
-                return tObservable.flatMap(new Func1<Response<T>, Observable<T>>() {
+            public Observable<T> call(Observable<Response> tObservable) {
+                return tObservable.flatMap(new Func1<Response, Observable<T>>() {
                     @Override
-                    public Observable<T> call(Response<T> result) {
-                        LoggerUtils.e(new Gson().toJson(result));
+                    public Observable<T> call(Response result) {
                         if (result.success()) {
-                            return flatResponse(result.getData());
+                            return (Observable<T>) flatResponse(result);
                         } else {
-                            return Observable.error(new APIException(result.getFlag(), result.getMsg()));
+                            return Observable.error(new APIException(result.getStatus(), result.getMsg()));
                         }
                     }
                 }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());

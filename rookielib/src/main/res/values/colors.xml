@@ -1,72 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorPrimary">#eaeaea</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
     <color name="transparent">#00FFFFFF</color>
-    <color name="white">#ffffff</color>
-    <color name="black">#ff4a4a4a</color>
-    <color name="line_color">#f3f3f3</color>
-    <color name="select_color">#f3f3f3</color>
-    <color name="gray_ac">#ffacacac</color>
-    <color name="gray">#ffcccccc</color>
-    <color name="gray_53">#ff535353</color>
-    <color name="theme_background">#fff4f4f4</color>
-    <color name="gray_6e">#ff6e6e6e</color>
+    <color name="white">#ffffffff</color>
+    <color name="black">#ff000000</color>
+    <color name="line_color">#e5e5e5</color>
+    <color name="theme_color">#30ac18</color>
+    <color name="theme_color_top">#30ac18</color>
+    <color name="color_e5">#e5e5e5</color>
+    <color name="color_ef">#efefef</color>
+    <color name="color_64">#646464</color>
+    <color name="color_53">#ff535353</color>
     <color name="black3">#ff333333</color>
-    <color name="red_dot">#fe6e68</color>
-    <color name="theme_color">#22CBCA</color>
-    <color name="theme_color_top">#22CBCA</color>
-    <color name="toolbar_text_color">#ff7a7a7a</color>
-    <color name="color_fa">#fafafa</color>
-
-    <color name="telphone_number_color">#4C93C9</color>
-    <color name="color_7a">#7a7a7a</color>
-
-    <!--导航字体-->
-    <color name="app_title_color">#7a7a7a</color>
-    <!--版本更新button背景-->
-    <color name="colorPrimary">#ff3F51B5</color>
-    <!--头部选中颜色-->
-    <color name="tab_select">#37dac8</color>
-    <!--listView顶部文字颜色-->
-    <color name="list_item_text_top">#515151</color>
-    <!--listView底部文字颜色-->
-    <color name="list_item_text_bottom">#ababab</color>
 
     <color name="background_color">#f6f6f6</color>
 
     <color name="select_button_end_color">#48deed</color>
     <color name="select_button_start_color">#35e9d8</color>
-
-    <color name="coin_tv_color">#33e1b6</color>
-
-    <color name="color_5e">#5e5e5e</color>
-
-    <color name="color_37">#37dac8</color>
-
-    <color name="color_f3">#f3f3f3</color>
-    <color name="color_51">#515151</color>
-
-    <color name="color_ab">#ababab</color>
-    <color name="color_cb">#cbcbcb</color>
-    <color name="voice_right">#fe6e68</color>
-
-    <color name="color_6d">#fe6d6a</color>
-
-    <color name="color_40">#40000000</color>
-
-    <color name="uncompleted_color">#A3E0D9</color>
-    <color name="uncompleted_text_color">#F8F8F8</color>
-
-
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="comment_divider">#cccccc</color>
-    <color name="chat_fenge">#c3c3c5</color>
-    <color name="background_eb">#ebebeb</color>
-    <color name="gray_c2">#c2c2c2</color>
-    <color name="black_51">#515151</color>
-    <color name="chat_background">#f7f7f7</color>
-    <color name="gray_ed">#ededed</color>
-    <color name="msg_mode">#cc000000</color>
-    <color name="TM">#01000000</color>
-    <color name="clor_f8">#f8f8f8</color>
 </resources>

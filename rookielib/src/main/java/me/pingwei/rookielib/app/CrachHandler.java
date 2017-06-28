@@ -8,6 +8,8 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.umeng.analytics.MobclickAgent;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
@@ -81,8 +83,8 @@ public class CrachHandler implements Thread.UncaughtExceptionHandler {
             }
             //退出程序
             ActivityTask.finishAllActivity();
-//            android.os.Process.killProcess(android.os.Process.myPid());
-//            System.exit(1);
+            android.os.Process.killProcess(android.os.Process.myPid());
+            System.exit(1);
         }
     }
 
@@ -101,13 +103,13 @@ public class CrachHandler implements Thread.UncaughtExceptionHandler {
             @Override
             public void run() {
                 Looper.prepare();
-                Toast.makeText(mContext, "Queble", Toast.LENGTH_LONG).show();
                 Looper.loop();
             }
         }.start();
         //收集设备参数信息
         collectDeviceInfo(mContext);
         //保存日志文件
+        MobclickAgent.reportError(mContext, ex);
         saveCrashInfo2File(ex);
         return true;
     }
@@ -183,6 +185,4 @@ public class CrachHandler implements Thread.UncaughtExceptionHandler {
             }
         }
     }
-
-
 }

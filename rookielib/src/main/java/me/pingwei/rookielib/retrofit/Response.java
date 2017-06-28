@@ -3,18 +3,17 @@ package me.pingwei.rookielib.retrofit;
 /**
  * Created by xupingwei on 2016/1/11.
  */
-public class Response<T> {
+public class Response {
 
-    private int flag;
+    private int status;
     private String msg;
-    private T data;
 
-    public int getFlag() {
-        return flag;
+    public int getStatus() {
+        return status;
     }
 
-    public void setFlag(int flag) {
-        this.flag = flag;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public String getMsg() {
@@ -25,24 +24,15 @@ public class Response<T> {
         this.msg = msg;
     }
 
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
-
     @Override
     public String toString() {
-        return "{flag: " + flag + "\n" +
+        return "{flag: " + status + "\n" +
                 "msg: " + msg + "\n" +
-                "data: " + data + "\n" +
                 "}";
     }
 
 
     public boolean success() {
-        return flag == 0;
+        return status == 1 || status == 80102003 || status == 9001;
     }
 }

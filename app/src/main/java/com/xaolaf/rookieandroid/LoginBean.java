@@ -1,14 +1,14 @@
 package com.xaolaf.rookieandroid;
 
-import org.litepal.crud.DataSupport;
-
 import java.io.Serializable;
+
+import me.pingwei.rookielib.retrofit.Response;
 
 /**
  * Created by xupingwei on 2016/12/30.
  */
 
-public class LoginBean extends DataSupport implements Serializable {
+public class LoginBean extends Response implements Serializable {
 
     private String token;
     private UserPass pass;

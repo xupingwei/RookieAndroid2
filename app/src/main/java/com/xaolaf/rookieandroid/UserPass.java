@@ -1,14 +1,12 @@
 package com.xaolaf.rookieandroid;
 
-import org.litepal.crud.DataSupport;
-
 import java.io.Serializable;
 
 /**
  * Created by xupingwei on 2016/12/30.
  */
 
-public class UserPass extends DataSupport implements Serializable {
+public class UserPass implements Serializable {
 
 
     /**

@@ -17,12 +17,28 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:typeface">monospace</item>
         <item name="android:screenOrientation">landscape</item>
+        <item name="android:colorPrimaryDark">@color/theme_color_top</item>
+        <item name="toolbarNavigationButtonStyle">@style/MyToolbarNavigationButtonStyle</item>
     </style>
 
     <style name="ToolbarTitle" parent="Theme">
-        <item name="android:textColor">@color/toolbar_text_color</item>
-        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:textSize">18sp</item>
+        <item name="android:subtitleTextStyle">@style/SubtitleTextStyle</item>
+    </style>
+
+    <style name="SubtitleTextStyle" parent="Theme">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MyToolbarNavigationButtonStyle" parent="@style/Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="android:minWidth">70dp</item>
+        <item name="android:paddingLeft">1dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:scaleType">center</item>
     </style>
 
     <!--dialog的样式-->

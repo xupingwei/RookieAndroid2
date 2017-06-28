@@ -1,1 +1,1 @@
-include ':app', ':v7appcompat', ':rookielib'
+include ':app', ':v7appcompat', ':rookielib', ':libzxing'

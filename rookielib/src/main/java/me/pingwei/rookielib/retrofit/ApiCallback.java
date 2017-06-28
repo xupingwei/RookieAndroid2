@@ -6,6 +6,11 @@ import android.content.DialogInterface;
 
 import com.google.gson.Gson;
 
+import org.greenrobot.eventbus.Subscribe;
+
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import me.pingwei.rookielib.utils.LoggerUtils;
 import retrofit2.adapter.rxjava.HttpException;
@@ -16,14 +21,20 @@ import rx.Subscriber;
  */
 public abstract class ApiCallback<T> extends Subscriber<T> {
 
-    private Context mContext;
+    protected Context mContext;
     private SweetAlertDialog dialog;
     private String msg;
+    //对应HTTP的状态码
+    private static final int UNAUTHORIZED = 401;
+    private static final int FORBIDDEN = 403;
+    private static final int NOT_FOUND = 404;
+    private static final int REQUEST_TIMEOUT = 408;
+    private static final int INTERNAL_SERVER_ERROR = 500;
+    private static final int BAD_GATEWAY = 502;
+    private static final int SERVICE_UNAVAILABLE = 503;
+    private static final int GATEWAY_TIMEOUT = 504;
     private boolean isShowDialog = true;
 
-//    protected boolean showDialog() {
-//        return true;
-//    }
 
     /**
      * @param context context
@@ -57,7 +68,6 @@ public abstract class ApiCallback<T> extends Subscriber<T> {
         this(context, "请稍后...", isShowDialog);
     }
 
-
     @Override
     public void onStart() {
         super.onStart();
@@ -86,16 +96,29 @@ public abstract class ApiCallback<T> extends Subscriber<T> {
             HttpException httpException = (HttpException) e;
             int code = httpException.code();
             String msg = httpException.getMessage();
-            LoggerUtils.d("code = " + code);
-            if (code == 504) {
-                msg = "网络不给力";
+            LoggerUtils.e("code = " + code);
+            switch (code) {
+                case UNAUTHORIZED:
+                case FORBIDDEN:
+                case NOT_FOUND:
+                case REQUEST_TIMEOUT:
+                case GATEWAY_TIMEOUT:
+                case INTERNAL_SERVER_ERROR:
+                case BAD_GATEWAY:
+                case SERVICE_UNAVAILABLE:
+                default:
+                    msg = "服务器异常，请稍后再试";
+                    break;
             }
-            if (code == 502 || code == 404) {
-                msg = "服务器异常，请稍后再试";
-            }
-            onFailure(msg);
+            onFailure(-200, msg);
+        } else if (e instanceof ConnectException) {
+            msg = "网络连接失败,请检查网络";
+            onFailure(-200, msg);
+        } else if (e instanceof SocketTimeoutException) {
+            msg = "网络连接超时，请重试";
+            onFailure(-200, msg);
         } else {
-            onFailure(e.getMessage());
+            onFailure(-100, e.getMessage());
         }
         if (isShowDialog)
             dialog.dismiss();
@@ -107,7 +130,7 @@ public abstract class ApiCallback<T> extends Subscriber<T> {
         if (isShowDialog)
             dialog.dismiss();
         LoggerUtils.json(new Gson().toJson(model));
-        onSuccess(model);
+//        onSuccess(model);
     }
 
     @Override
@@ -119,5 +142,5 @@ public abstract class ApiCallback<T> extends Subscriber<T> {
 
     public abstract void onSuccess(T model);
 
-    public abstract void onFailure(String msg);
+    public abstract void onFailure(int errorCode, String msg);
 }
