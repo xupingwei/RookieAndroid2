@@ -1,10 +1,11 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.jakewharton.butterknife'
+apply plugin: 'org.greenrobot.greendao'
 android {
     compileSdkVersion 25
     buildToolsVersion '25.0.2'
     defaultConfig {
-        applicationId "com.xiaoyeyun.android"
+        applicationId "com.xaolaf.rookieandroid"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 10000
@@ -41,4 +42,12 @@ dependencies {
     //图片放大
     compile 'com.github.chrisbanes:PhotoView:2.0.0'
     compile project(':rookielib')
+
+    compile 'org.greenrobot:greendao:3.2.0'
+    compile 'org.greenrobot:greendao-generator:3.1.0'
+}
+greendao {
+    schemaVersion 1
+//    targetGenDir 'src/main/java'
+//    daoPackage 'com.xaolaf.rookieandroid'
 }
